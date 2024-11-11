@@ -2,4 +2,4 @@
 
 eval_gemfile '../Gemfile'
 
-gem 'actionmailer', '~> 7.1.0'
+gem 'rails', github: 'rails/rails'
