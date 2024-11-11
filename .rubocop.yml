@@ -12,6 +12,7 @@ Metrics/BlockLength:
 
 Naming/FileName:
   Exclude:
+    - 'gemfiles/*.gemfile'
     - 'lib/aws-actionmailer-ses.rb'
 
 Style/BlockComments:
