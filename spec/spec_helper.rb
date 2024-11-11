@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-actionmailer-ses'
 require 'action_mailer'
 
