@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.version      = version
   spec.author       = 'Amazon Web Services'
   spec.email        = ['aws-dr-rubygems@amazon.com']
-  spec.summary       = 'ActionMailer integration with SES'
-  spec.description   = 'Amazon Simple Email Service as an ActionMailer delivery method'
-  spec.homepage      = 'https://github.com/aws/aws-actionmailer-ses-ruby'
-  spec.license       = 'Apache-2.0'
-  spec.files         = Dir['LICENSE', 'CHANGELOG.md', 'VERSION', 'lib/**/*']
+  spec.summary      = 'ActionMailer integration with SES'
+  spec.description  = 'Amazon Simple Email Service as an ActionMailer delivery method'
+  spec.homepage     = 'https://github.com/aws/aws-actionmailer-ses-ruby'
+  spec.license      = 'Apache-2.0'
+  spec.files        = Dir['LICENSE', 'CHANGELOG.md', 'VERSION', 'lib/**/*']
 
   spec.add_dependency('actionmailer', '>= 7.1.0')
 
