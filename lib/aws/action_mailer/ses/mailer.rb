@@ -24,7 +24,7 @@ module Aws
         #   [Aws::SES::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SES/Client.html#initialize-instance_method).
         def initialize(options = {})
           @client = Aws::SES::Client.new(options)
-          @client.config.user_agent_frameworks << 'aws-sdk-rails'
+          @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
