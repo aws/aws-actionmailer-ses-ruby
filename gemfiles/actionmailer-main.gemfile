@@ -2,4 +2,4 @@
 
 eval_gemfile '../Gemfile'
 
-gem 'actionmailer', github: 'rails/rails', path: 'actionmailer'
+gem 'actionmailer', github: 'rails/rails', glob: 'actionmailer/actionmailer.gemspec'
