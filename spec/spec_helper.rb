@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'aws-actionmailer-ses'
 require 'action_mailer'
+require 'aws-actionmailer-ses'
 
 class TestMailer < ActionMailer::Base
   layout nil

@@ -40,8 +40,8 @@ To use these mailers as a delivery method, you need to register them with
 
 ```ruby
 options = { region: 'us-west-2' }
-ActionMailer::Base.add_delivery_method :ses, Aws::ActionMailer::SESMailer, **options
-ActionMailer::Base.add_delivery_method :ses_v2, Aws::ActionMailer::SESV2Mailer, **options
+ActionMailer::Base.add_delivery_method :ses, Aws::ActionMailer::SES::Mailer, **options
+ActionMailer::Base.add_delivery_method :ses_v2, Aws::ActionMailer::SESV2::Mailer, **options
 ```
 
 In your Rails environment configuration, set the delivery method to
