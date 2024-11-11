@@ -13,6 +13,8 @@ Gem::Specification.new do |spec|
   spec.license       = 'Apache-2.0'
   spec.files         = Dir['LICENSE', 'CHANGELOG.md', 'VERSION', 'lib/**/*']
 
+  spec.add_dependency('actionmailer', '>= 7.1.0')
+
   # Require these versions for user_agent_framework configs
   spec.add_dependency('aws-sdk-ses', '~> 1', '>= 1.50.0')
   spec.add_dependency('aws-sdk-sesv2', '~> 1', '>= 1.34.0')

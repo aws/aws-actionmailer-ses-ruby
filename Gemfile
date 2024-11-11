@@ -12,7 +12,6 @@ group :development do
 end
 
 group :test do
-  gem 'actionmailer'
   gem 'rspec'
 end
 
