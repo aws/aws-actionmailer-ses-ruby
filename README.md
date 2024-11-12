@@ -13,8 +13,8 @@ delivery method classes with Amazon SES and SESV2.
 Add this gem to your Rails project's Gemfile:
 
 ```ruby
-gem 'aws-sdk-rails', '~> 4'
-gem 'aws-actionmailer-ses', '~> 1.0'
+gem 'aws-sdk-rails', '~> 4' # optional, but recommended
+gem 'aws-actionmailer-ses', '~> 0'
 ```
 
 Then run `bundle install`.
