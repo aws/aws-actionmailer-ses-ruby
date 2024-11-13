@@ -1,9 +1,9 @@
 # ActionMailer delivery with Amazon Simple Email Service
 
-[![Gem Version](https://badge.fury.io/rb/aws-sdk-rails.svg)](https://badge.fury.io/rb/aws-sdk-rails)
-[![Build Status](https://github.com/aws/aws-sdk-rails/workflows/CI/badge.svg)](https://github.com/aws/aws-sdk-rails/actions)
-[![Github forks](https://img.shields.io/github/forks/aws/aws-sdk-rails.svg)](https://github.com/aws/aws-sdk-rails/network)
-[![Github stars](https://img.shields.io/github/stars/aws/aws-sdk-rails.svg)](https://github.com/aws/aws-sdk-rails/stargazers)
+[![Gem Version](https://badge.fury.io/rb/aws-actionmailer-ses-ruby.svg)](https://badge.fury.io/rb/aws-actionmailer-ses-ruby)
+[![Build Status](https://github.com/aws/aws-actionmailer-ses-ruby/workflows/CI/badge.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/actions)
+[![Github forks](https://img.shields.io/github/forks/aws/aws-actionmailer-ses-ruby.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/network)
+[![Github stars](https://img.shields.io/github/stars/aws/aws-actionmailer-ses-ruby.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/stargazers)
 
 This gem contains [ActionMailer](https://guides.rubyonrails.org/action_mailer_basics.html)
 delivery method classes with Amazon SES and SESV2.
