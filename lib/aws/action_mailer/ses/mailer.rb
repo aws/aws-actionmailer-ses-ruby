@@ -9,14 +9,13 @@ module Aws
       #
       # Configure a delivery method with:
       #
-      #   client_options = { region: 'us-west-2' }
-      #   ActionMailer::Base.add_delivery_method :ses, Aws::ActionMailer::SESMailer, **client_options
+      #     client_options = { region: 'us-west-2' }
+      #     ActionMailer::Base.add_delivery_method :ses, Aws::ActionMailer::SESMailer, **client_options
       #
       # Client options are used to construct a new Aws::SES::Client instance.
-      #
       # Once you have a delivery method, you can configure your Rails environment to use it:
       #
-      #   config.action_mailer.delivery_method = :ses
+      #     config.action_mailer.delivery_method = :ses
       #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer

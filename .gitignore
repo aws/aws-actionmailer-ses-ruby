@@ -1,3 +1,6 @@
 .idea/
 Gemfile.lock
 gemfiles/*.gemfile.lock
+
+.yardoc/
+doc/
