@@ -2,6 +2,8 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.7
   SuggestExtensions: false
+  Exclude:
+    - 'tasks/release/**/*'
 
 Gemspec/RequireMFA:
   Enabled: false
