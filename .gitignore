@@ -1,6 +1,11 @@
 .idea/
-Gemfile.lock
-gemfiles/*.gemfile.lock
+.byebug_history
 
+Gemfile.lock
+*.gem
+
+coverage/
 .yardoc/
 doc/
+docs.zip
+.release/
