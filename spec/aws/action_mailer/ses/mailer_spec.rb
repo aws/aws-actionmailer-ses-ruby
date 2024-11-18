@@ -33,12 +33,13 @@ module Aws
         end
 
         before do
-          ::ActionMailer::Base.add_delivery_method :ses, Mailer, **client_options
+          ::ActionMailer::Base.add_delivery_method :ses, Mailer
+          ::ActionMailer::Base.ses_settings = client_options
         end
 
         describe '#settings' do
-          it 'returns an empty hash' do
-            expect(mailer.settings).to eq({})
+          it 'returns the client options' do
+            expect(mailer.settings).to eq(client_options)
           end
         end
 

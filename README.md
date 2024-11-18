@@ -13,7 +13,6 @@ delivery method classes with Amazon SES and SESV2.
 Add this gem to your Rails project's Gemfile:
 
 ```ruby
-gem 'aws-sdk-rails', '~> 4'
 gem 'aws-actionmailer-ses', '~> 0'
 ```
 
@@ -34,21 +33,24 @@ check Amazon EC2 instance metadata for credentials to load. Learn more:
 
 ## Usage
 
-To use these mailers as a delivery method, you need to register them with
-`ActionMailer::Base`. You can create a Rails initializer
-`config/initializers/action_mailer.rb` with contents similar to the following:
+To use these mailers as a delivery method, you need to set the delivery method
+and configure the delivery method with the appropriate settings. For example,
+to configure ActionMailer to use the Amazon SESV2 API in the `us-west-2`
+region, you can add the following to an environment file in your Rails
+application:
 
 ```ruby
-options = { region: 'us-west-2' }
-ActionMailer::Base.add_delivery_method :ses, Aws::ActionMailer::SES::Mailer, **options
-ActionMailer::Base.add_delivery_method :ses_v2, Aws::ActionMailer::SESV2::Mailer, **options
-```
+# config/environments/production.rb
 
-In your Rails environment configuration, set the delivery method to
-`:ses` or `:ses_v2`.
+Rails.application.configure do |config|
+  ...
 
-```ruby
-config.action_mailer.delivery_method = :ses # or :ses_v2
+  # Use the Amazon SESV2 API in the us-west-2 region
+  config.action_mailer.delivery_method = :ses_v2
+  config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
+
+  ...
+end
 ```
 
 ## Using ARNs with SES
@@ -59,13 +61,13 @@ to send emails. These operations allows you to specify a cross-account identity
 for the email's Source, From, and Return-Path. To set these ARNs, use any of the
 following headers on your `Mail::Message` object returned by your Mailer class:
 
-* X-SES-SOURCE-ARN
-* X-SES-FROM-ARN
-* X-SES-RETURN-PATH-ARN
+* `X-SES-SOURCE-ARN`
+* `X-SES-FROM-ARN`
+* `X-SES-RETURN-PATH-ARN`
 
 Example:
 
-```
+```ruby
 # in your Rails controller
 message = MyMailer.send_email(options)
 message['X-SES-FROM-ARN'] = 'arn:aws:ses:us-west-2:012345678910:identity/bigchungus@memes.com'
