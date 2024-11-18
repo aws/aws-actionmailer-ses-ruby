@@ -1,6 +1,6 @@
 # ActionMailer delivery with Amazon Simple Email Service
 
-[![Gem Version](https://badge.fury.io/rb/aws-actionmailer-ses-ruby.svg)](https://badge.fury.io/rb/aws-actionmailer-ses-ruby)
+[![Gem Version](https://badge.fury.io/rb/aws-actionmailer-ses.svg)](https://badge.fury.io/rb/aws-actionmailer-ses)
 [![Build Status](https://github.com/aws/aws-actionmailer-ses-ruby/workflows/CI/badge.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/actions)
 [![Github forks](https://img.shields.io/github/forks/aws/aws-actionmailer-ses-ruby.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/network)
 [![Github stars](https://img.shields.io/github/stars/aws/aws-actionmailer-ses-ruby.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/stargazers)
