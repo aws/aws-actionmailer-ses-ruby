@@ -15,6 +15,8 @@ module Aws
       #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer
+        attr_reader :settings
+
         # @param [Hash] settings Passes along initialization options to
         #   [Aws::SES::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SES/Client.html#initialize-instance_method).
         def initialize(settings = {})
@@ -33,11 +35,6 @@ module Aws
           @client.send_raw_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id
           end
-        end
-
-        # @return [Hash]
-        def settings
-          @settings
         end
       end
     end

@@ -1,7 +1,16 @@
 # frozen_string_literal: true
 
-require 'action_mailer'
+require 'action_mailer/railtie'
 require 'aws-actionmailer-ses'
+
+# Create a new Rails application to test that the Aws::ActionMailer::Railtie
+# properly initializes the SES and SESV2 ActionMailer delivery methods.
+class TestApp < Rails::Application
+  config.load_defaults Rails::VERSION::STRING.to_f
+  config.eager_load = false
+end
+
+Rails.application.initialize!
 
 class TestMailer < ActionMailer::Base
   layout nil

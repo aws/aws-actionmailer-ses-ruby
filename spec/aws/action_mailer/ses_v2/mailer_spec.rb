@@ -33,7 +33,6 @@ module Aws
         end
 
         before do
-          ::ActionMailer::Base.add_delivery_method :ses_v2, Mailer
           ::ActionMailer::Base.ses_v2_settings = client_options
         end
 
