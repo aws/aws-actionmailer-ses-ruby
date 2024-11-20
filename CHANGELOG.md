@@ -1,6 +1,8 @@
 Unreleased Changes
 ------------------
 
+* Feature - [Major Version] Register ActionMailers with a Railtie and allow for configuration using `config.action_mailer.ses_v2_settings` and `config.action_mailer.ses_settings`.
+
 0.1.0 (2024-11-16)
 ------------------
 
