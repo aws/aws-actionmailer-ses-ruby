@@ -2,6 +2,7 @@
 
 require_relative 'aws/action_mailer/ses/mailer'
 require_relative 'aws/action_mailer/ses_v2/mailer'
+require_relative 'aws/action_mailer/railtie' if defined?(Rails::Railtie)
 
 module Aws
   module ActionMailer

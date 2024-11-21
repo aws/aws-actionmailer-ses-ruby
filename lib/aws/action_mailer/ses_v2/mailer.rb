@@ -7,22 +7,21 @@ module Aws
     module SESV2
       # Provides a delivery method for ActionMailer that uses Amazon Simple Email Service V2.
       #
-      # Configure a delivery method with:
-      #
-      #     client_options = { region: 'us-west-2' }
-      #     ActionMailer::Base.add_delivery_method :ses_v2, Aws::ActionMailer::SESV2Mailer, **client_options
-      #
-      # Client options are used to construct a new Aws::SESV2::Client instance.
+      # Delivery settings are used to construct a new Aws::SESV2::Client instance.
       # Once you have a delivery method, you can configure your Rails environment to use it:
       #
       #     config.action_mailer.delivery_method = :ses_v2
+      #     config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
       #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer
-        # @param [Hash] options Passes along initialization options to
+        attr_reader :settings
+
+        # @param [Hash] settings Passes along initialization settings to
         #   [Aws::SESV2::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#initialize-instance_method).
-        def initialize(options = {})
-          @client = Aws::SESV2::Client.new(options)
+        def initialize(settings = {})
+          @settings = settings
+          @client = Aws::SESV2::Client.new(settings)
           @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
         end
 
@@ -39,11 +38,6 @@ module Aws
           @client.send_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id
           end
-        end
-
-        # @return [Hash]
-        def settings
-          {}
         end
 
         private

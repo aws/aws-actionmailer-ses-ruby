@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
-require 'action_mailer'
-require 'aws-actionmailer-ses'
+ENV['RAILS_ENV'] = 'test'
+
+require_relative 'dummy/config/application'
+
+Rails.application.initialize!
 
 class TestMailer < ActionMailer::Base
   layout nil
