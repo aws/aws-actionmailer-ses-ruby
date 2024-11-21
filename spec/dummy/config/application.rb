@@ -12,5 +12,8 @@ module Dummy
     config.load_defaults Rails::VERSION::STRING.to_f
     config.eager_load = true
     config.secret_key_base = 'secret'
+
+    config.action_mailer.ses_settings = { region: 'peccy' }
+    config.action_mailer.ses_v2_settings = { region: 'peccy_v2' }
   end
 end
