@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+
+permissions:
+  contents: read
+
 env:
   ruby_version: 3.4
 
