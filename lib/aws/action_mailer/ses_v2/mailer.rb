@@ -19,21 +19,22 @@ module Aws
 
         # @param [Hash] settings Passes along initialization settings to
         #   [Aws::SESV2::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#initialize-instance_method).
+        #   Additionally supports :configuration_set_name for setting a default configuration set.
         def initialize(settings = {})
           @settings = settings
+          @configuration_set_name = settings.delete(:configuration_set_name)
           @client = Aws::SESV2::Client.new(settings)
           @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
         def deliver!(message)
-          params = { content: { raw: { data: message.to_s } } }
-          params[:from_email_address] = from_email_address(message)
-          params[:destination] = {
-            to_addresses: to_addresses(message),
-            cc_addresses: message.cc,
-            bcc_addresses: message.bcc
-          }
+          params = {
+            content: { raw: { data: message.to_s } },
+            from_email_address: from_email_address(message),
+            destination: destination(message),
+            configuration_set_name: configuration_set_name(message)
+          }.compact
 
           @client.send_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id
@@ -49,11 +50,25 @@ module Aws
           message.instance_variable_get(:@smtp_envelope_from) ? message.smtp_envelope_from : nil
         end
 
+        def destination(message)
+          {
+            to_addresses: to_addresses(message),
+            cc_addresses: message.cc,
+            bcc_addresses: message.bcc
+          }
+        end
+
         # smtp_envelope_to will default to the full destinations (To, Cc, Bcc)
         # SES v2 API prefers each component split out into a destination hash.
         # When smtp_envelope_to was set, use it explicitly for to_address only.
         def to_addresses(message)
           message.instance_variable_get(:@smtp_envelope_to) ? message.smtp_envelope_to : message.to
+        end
+
+        # Returns the configuration set name from the message header or falls back to the global setting.
+        # Per-message headers take precedence over the global configuration.
+        def configuration_set_name(message)
+          message.header['X-SES-CONFIGURATION-SET']&.value || @configuration_set_name
         end
       end
     end

@@ -80,6 +80,46 @@ module Aws
             expect(raw).to include('X-SES-CONFIGURATION-SET: TestConfigSet')
             expect(raw).to include('X-SES-LIST-MANAGEMENT-OPTIONS: contactListName; topic=topic')
           end
+
+          context 'configuration_set_name' do
+            it 'uses configuration_set_name from settings' do
+              mailer_with_config_set = Mailer.new(
+                client_options.merge(configuration_set_name: 'GlobalConfigSet')
+              )
+              message = TestMailer.deliverable(
+                body: 'Test',
+                from: 'sender@example.com',
+                to: 'recipient@example.com',
+                delivery_method: :ses_v2
+              )
+              mailer_data = mailer_with_config_set.deliver!(message).context.params
+              expect(mailer_data[:configuration_set_name]).to eq('GlobalConfigSet')
+            end
+
+            it 'uses X-SES-CONFIGURATION-SET header for per-message override' do
+              mailer_data = mailer.deliver!(sample_message).context.params
+              expect(mailer_data[:configuration_set_name]).to eq('TestConfigSet')
+            end
+
+            it 'header takes precedence over global setting' do
+              mailer_with_config_set = Mailer.new(
+                client_options.merge(configuration_set_name: 'GlobalConfigSet')
+              )
+              mailer_data = mailer_with_config_set.deliver!(sample_message).context.params
+              expect(mailer_data[:configuration_set_name]).to eq('TestConfigSet')
+            end
+
+            it 'does not include configuration_set_name when not set' do
+              message = TestMailer.deliverable(
+                body: 'Test',
+                from: 'sender@example.com',
+                to: 'recipient@example.com',
+                delivery_method: :ses_v2
+              )
+              mailer_data = mailer.deliver!(message).context.params
+              expect(mailer_data).not_to have_key(:configuration_set_name)
+            end
+          end
         end
       end
     end
