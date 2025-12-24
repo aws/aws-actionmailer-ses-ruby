@@ -27,13 +27,12 @@ module Aws
 
         # Delivers a Mail::Message object. Called during mail delivery.
         def deliver!(message)
-          params = { content: { raw: { data: message.to_s } } }
-          params[:from_email_address] = from_email_address(message)
-          params[:destination] = {
-            to_addresses: to_addresses(message),
-            cc_addresses: message.cc,
-            bcc_addresses: message.bcc
-          }
+          params = {
+            content: { raw: { data: message.to_s } },
+            from_email_address: from_email_address(message),
+            destination: destination(message),
+            email_tags: email_tags(message)
+          }.compact
 
           @client.send_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id
@@ -49,11 +48,32 @@ module Aws
           message.instance_variable_get(:@smtp_envelope_from) ? message.smtp_envelope_from : nil
         end
 
+        def destination(message)
+          {
+            to_addresses: to_addresses(message),
+            cc_addresses: message.cc,
+            bcc_addresses: message.bcc
+          }
+        end
+
         # smtp_envelope_to will default to the full destinations (To, Cc, Bcc)
         # SES v2 API prefers each component split out into a destination hash.
         # When smtp_envelope_to was set, use it explicitly for to_address only.
         def to_addresses(message)
           message.instance_variable_get(:@smtp_envelope_to) ? message.smtp_envelope_to : message.to
+        end
+
+        # Parses X-SES-MESSAGE-TAGS header into email_tags array for the SES v2 API.
+        # Header format: "tagName1=tagValue1, tagName2=tagValue2"
+        # Returns nil if no tags are present.
+        def email_tags(message)
+          header = message.header['X-SES-MESSAGE-TAGS']
+          return unless header
+
+          header.value.split(',').map do |tag|
+            name, value = tag.strip.split('=', 2)
+            { name: name, value: value }
+          end
         end
       end
     end

@@ -80,6 +80,62 @@ module Aws
             expect(raw).to include('X-SES-CONFIGURATION-SET: TestConfigSet')
             expect(raw).to include('X-SES-LIST-MANAGEMENT-OPTIONS: contactListName; topic=topic')
           end
+
+          context 'email_tags' do
+            it 'parses X-SES-MESSAGE-TAGS header into email_tags parameter' do
+              message = TestMailer.deliverable(
+                body: 'Test',
+                from: 'sender@example.com',
+                to: 'recipient@example.com',
+                headers: { 'X-SES-MESSAGE-TAGS' => 'campaign=welcome, user_id=123' },
+                delivery_method: :ses_v2
+              )
+              mailer_data = mailer.deliver!(message).context.params
+              expect(mailer_data[:email_tags]).to eq([
+                { name: 'campaign', value: 'welcome' },
+                { name: 'user_id', value: '123' }
+              ])
+            end
+
+            it 'handles single tag' do
+              message = TestMailer.deliverable(
+                body: 'Test',
+                from: 'sender@example.com',
+                to: 'recipient@example.com',
+                headers: { 'X-SES-MESSAGE-TAGS' => 'campaign=newsletter' },
+                delivery_method: :ses_v2
+              )
+              mailer_data = mailer.deliver!(message).context.params
+              expect(mailer_data[:email_tags]).to eq([
+                { name: 'campaign', value: 'newsletter' }
+              ])
+            end
+
+            it 'handles values containing equals signs' do
+              message = TestMailer.deliverable(
+                body: 'Test',
+                from: 'sender@example.com',
+                to: 'recipient@example.com',
+                headers: { 'X-SES-MESSAGE-TAGS' => 'data=key=value' },
+                delivery_method: :ses_v2
+              )
+              mailer_data = mailer.deliver!(message).context.params
+              expect(mailer_data[:email_tags]).to eq([
+                { name: 'data', value: 'key=value' }
+              ])
+            end
+
+            it 'does not include email_tags when header is not set' do
+              message = TestMailer.deliverable(
+                body: 'Test',
+                from: 'sender@example.com',
+                to: 'recipient@example.com',
+                delivery_method: :ses_v2
+              )
+              mailer_data = mailer.deliver!(message).context.params
+              expect(mailer_data).not_to have_key(:email_tags)
+            end
+          end
         end
       end
     end
