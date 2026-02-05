@@ -50,6 +50,12 @@ Rails.application.configure do |config|
   config.action_mailer.delivery_method = :ses_v2
   config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
 
+  # Provide a precreated SESV2 client (optional)
+  # Useful when you want to reuse a single client to avoid creating a new
+  # short-lived credential session for every email.
+  sesv2_client = Aws::SESV2::Client.new(region: 'us-west-2')
+  config.action_mailer.ses_v2_settings = { sesv2_client: sesv2_client }
+
   ...
 end
 ```

@@ -21,7 +21,7 @@ module Aws
         #   [Aws::SESV2::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#initialize-instance_method).
         def initialize(settings = {})
           @settings = settings
-          @client = Aws::SESV2::Client.new(settings)
+          @client = settings.delete(:sesv2_client) || Aws::SESV2::Client.new(settings)
           @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
         end
 
