@@ -19,9 +19,13 @@ module Aws
 
         # @param [Hash] settings Passes along initialization options to
         #   [Aws::SES::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SES/Client.html#initialize-instance_method).
+        #   You may pass +:ses_client+ with a preconstructed {Aws::SES::Client} to reuse one
+        #   instance (e.g. to avoid credential refresh churn). That key is not forwarded to the SDK.
         def initialize(settings = {})
           @settings = settings
-          @client = Aws::SES::Client.new(settings)
+          client_settings = settings.dup
+          injected = client_settings.delete(:ses_client)
+          @client = injected || Aws::SES::Client.new(client_settings)
           @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
         end
 

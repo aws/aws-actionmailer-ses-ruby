@@ -43,6 +43,26 @@ module Aws
         end
 
         describe '#deliver' do
+          it 'uses a precreated SES client when provided' do
+            client = Aws::SES::Client.new(
+              stub_responses: { send_raw_email: { message_id: ses_message_id } }
+            )
+            mailer = Mailer.new(ses_client: client)
+
+            mailer_data = mailer.deliver!(sample_message).context.params
+            expect(mailer_data[:raw_message][:data].to_s).to include('Hallo')
+          end
+
+          it 'does not remove :ses_client from the settings hash (ActionMailer reuses it)' do
+            client = Aws::SES::Client.new(
+              stub_responses: { send_raw_email: { message_id: ses_message_id } }
+            )
+            settings = { ses_client: client }
+            Mailer.new(settings)
+
+            expect(settings[:ses_client]).to be(client)
+          end
+
           it 'delivers the message' do
             mailer_data = mailer.deliver!(sample_message).context.params
             raw = mailer_data[:raw_message][:data].to_s
