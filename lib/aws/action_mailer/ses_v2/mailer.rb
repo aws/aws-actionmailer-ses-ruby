@@ -15,7 +15,7 @@ module Aws
       #
       # Alternatively, you could pass the client itself.
       #
-      # The passed in client will be prioritized regardless of other `:ses_settings` given.
+      # The passed in client will be prioritized regardless of other `:ses_v2_settings` given.
       #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer
@@ -31,9 +31,7 @@ module Aws
           client_settings = settings.dup
           @client = client_settings.delete(:sesv2_client) || Aws::SESV2::Client.new(client_settings)
 
-          unless @client.config.user_agent_frameworks.include?('aws-actionmailer-ses')
-            @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
-          end
+          update_user_agent
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
@@ -52,6 +50,12 @@ module Aws
         end
 
         private
+
+        def update_user_agent
+          return if @client.config.user_agent_frameworks.include?('aws-actionmailer-ses')
+
+          @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
+        end
 
         # smtp_envelope_from will default to the From address *without* sender names.
         # By omitting this param, SESv2 will correctly use sender names from the mail headers.

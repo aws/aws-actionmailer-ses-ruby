@@ -31,9 +31,7 @@ module Aws
           client_settings = settings.dup
           @client = client_settings.delete(:ses_client) || Aws::SES::Client.new(client_settings)
 
-          unless @client.config.user_agent_frameworks.include?('aws-actionmailer-ses')
-            @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
-          end
+          update_user_agent
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
@@ -46,6 +44,14 @@ module Aws
           @client.send_raw_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id
           end
+        end
+
+        private
+
+        def update_user_agent
+          return if @client.config.user_agent_frameworks.include?('aws-actionmailer-ses')
+
+          @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
         end
       end
     end
