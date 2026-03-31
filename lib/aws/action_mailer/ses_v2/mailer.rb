@@ -7,22 +7,31 @@ module Aws
     module SESV2
       # Provides a delivery method for ActionMailer that uses Amazon Simple Email Service V2.
       #
-      # Delivery settings are used to construct a new Aws::SESV2::Client instance.
+      # Delivery settings are used to construct a new `Aws::SESV2::Client` instance.
       # Once you have a delivery method, you can configure your Rails environment to use it:
       #
       #     config.action_mailer.delivery_method = :ses_v2
       #     config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
       #
+      # Alternatively, you could pass the client itself.
+      #
+      # The passed in client will be prioritized regardless of other `:ses_v2_settings` given.
+      #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer
         attr_reader :settings
 
-        # @param [Hash] settings Passes along initialization settings to
-        #   [Aws::SESV2::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#initialize-instance_method).
+        # @param [Hash] settings
+        #   Passes along initialization settings to [Aws::SESV2::Client.new](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#initialize-instance_method).
+        #   You may pass `:sesv2_client` with a preconstructed {Aws::SESV2::Client} to reuse
+        #   an existing instance (e.g. to avoid credential resolution on every delivery).
+        #   When provided, the injected client is used and all other options are ignored.
         def initialize(settings = {})
           @settings = settings
-          @client = Aws::SESV2::Client.new(settings)
-          @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
+          client_settings = settings.dup
+          @client = client_settings.delete(:sesv2_client) || Aws::SESV2::Client.new(client_settings)
+
+          update_user_agent
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
@@ -41,6 +50,12 @@ module Aws
         end
 
         private
+
+        def update_user_agent
+          return if @client.config.user_agent_frameworks.include?('aws-actionmailer-ses')
+
+          @client.config.user_agent_frameworks << 'aws-actionmailer-ses'
+        end
 
         # smtp_envelope_from will default to the From address *without* sender names.
         # By omitting this param, SESv2 will correctly use sender names from the mail headers.

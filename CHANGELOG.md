@@ -1,6 +1,8 @@
 Unreleased Changes
 ------------------
 
+* Feature - Support injecting a preconstructed client via `:ses_client` and `:sesv2_client` options.
+
 1.0.0 (2024-11-21)
 ------------------
 

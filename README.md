@@ -34,21 +34,39 @@ check Amazon EC2 instance metadata for credentials to load. Learn more:
 
 ## Usage
 
-To use these mailers as a delivery method, you need to set the delivery method
-and configure the delivery method with the appropriate settings. For example,
-to configure ActionMailer to use the Amazon SESV2 API in the `us-west-2`
-region, you can add the following to an environment file in your Rails
-application:
+To use these mailers as a delivery method, set the delivery method and
+configure the corresponding settings in an environment file (for example
+`config/environments/production.rb`).
+
+### SES API (v1)
 
 ```ruby
-# config/environments/production.rb
-
 Rails.application.configure do |config|
   ...
 
-  # Use the Amazon SESV2 API in the us-west-2 region
+  config.action_mailer.delivery_method = :ses
+  config.action_mailer.ses_settings = { region: 'us-west-2' }
+
+  # Optional: reuse one client (e.g. fewer credential refreshes per email)
+  ses_client = Aws::SES::Client.new(region: 'us-west-2')
+  config.action_mailer.ses_settings = { ses_client: ses_client }
+
+  ...
+end
+```
+
+### SESV2 API
+
+```ruby
+Rails.application.configure do |config|
+  ...
+
   config.action_mailer.delivery_method = :ses_v2
   config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
+
+  # Optional: reuse one client (e.g. fewer credential refreshes per email)
+  sesv2_client = Aws::SESV2::Client.new(region: 'us-west-2')
+  config.action_mailer.ses_v2_settings = { sesv2_client: sesv2_client }
 
   ...
 end
