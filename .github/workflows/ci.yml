@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env:
-  ruby_version: 3.4
+  ruby_version: '4.0'
 
 jobs:
   test:
@@ -39,7 +39,7 @@ jobs:
             ruby: 3.1
           - rails: '8.0'
             ruby: jruby-9.4
-          # Rails main is Ruby >= 3.2
+          # Rails main is Ruby >= 3.3
           - rails: main
             ruby: 2.7
           - rails: main
@@ -52,7 +52,7 @@ jobs:
             ruby: jruby-9.4
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set RAILS_VERSION
         run: echo "RAILS_VERSION=${{ matrix.rails }}" >> $GITHUB_ENV
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
