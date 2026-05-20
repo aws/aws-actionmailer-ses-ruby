@@ -19,6 +19,12 @@ module Aws
       #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer
+        SEND_EMAIL_KEYS = %i[
+          configuration_set_name
+          email_tags
+          list_management_options
+        ].freeze
+
         attr_reader :settings
 
         # @param [Hash] settings
@@ -26,18 +32,14 @@ module Aws
         #   You may pass `:sesv2_client` with a preconstructed {Aws::SESV2::Client} to reuse
         #   an existing instance (e.g. to avoid credential resolution on every delivery).
         #   When provided, the injected client is used and all other options are ignored.
-        #
-        #   Pass `:list_management_options` (a {Types::ListManagementOptions} hash) to enable
-        #   SES subscription management — typically supplied via ActionMailer's
-        #   `delivery_method_options` so it can be set per-mailer or per-message:
-        #
-        #     default delivery_method_options: {
-        #       list_management_options: { contact_list_name: "...", topic_name: "..." }
-        #     }
         def initialize(settings = {})
           @settings = settings
+          @send_email_params = {}
           client_settings = settings.dup
-          @list_management_options = client_settings.delete(:list_management_options)
+          SEND_EMAIL_KEYS.each do |key|
+            value = client_settings.delete(key)
+            @send_email_params[key] = value if value
+          end
           @client = client_settings.delete(:sesv2_client) || Aws::SESV2::Client.new(client_settings)
 
           update_user_agent
@@ -52,7 +54,7 @@ module Aws
             cc_addresses: message.cc,
             bcc_addresses: message.bcc
           }
-          params[:list_management_options] = @list_management_options if @list_management_options
+          params.merge!(@send_email_params)
 
           @client.send_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id
