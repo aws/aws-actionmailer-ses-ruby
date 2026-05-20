@@ -26,9 +26,18 @@ module Aws
         #   You may pass `:sesv2_client` with a preconstructed {Aws::SESV2::Client} to reuse
         #   an existing instance (e.g. to avoid credential resolution on every delivery).
         #   When provided, the injected client is used and all other options are ignored.
+        #
+        #   Pass `:list_management_options` (a {Types::ListManagementOptions} hash) to enable
+        #   SES subscription management — typically supplied via ActionMailer's
+        #   `delivery_method_options` so it can be set per-mailer or per-message:
+        #
+        #     default delivery_method_options: {
+        #       list_management_options: { contact_list_name: "...", topic_name: "..." }
+        #     }
         def initialize(settings = {})
           @settings = settings
           client_settings = settings.dup
+          @list_management_options = client_settings.delete(:list_management_options)
           @client = client_settings.delete(:sesv2_client) || Aws::SESV2::Client.new(client_settings)
 
           update_user_agent
@@ -43,6 +52,7 @@ module Aws
             cc_addresses: message.cc,
             bcc_addresses: message.bcc
           }
+          params[:list_management_options] = @list_management_options if @list_management_options
 
           @client.send_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id

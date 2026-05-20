@@ -100,6 +100,38 @@ module Aws
             expect(raw).to include('X-SES-CONFIGURATION-SET: TestConfigSet')
             expect(raw).to include('X-SES-LIST-MANAGEMENT-OPTIONS: contactListName; topic=topic')
           end
+
+          context 'with :list_management_options in settings' do
+            let(:list_management_options) do
+              { contact_list_name: 'MarketingList', topic_name: 'Promos' }
+            end
+            let(:client_options) do
+              {
+                stub_responses: { send_email: { message_id: ses_message_id } },
+                list_management_options: list_management_options
+              }
+            end
+
+            it 'passes list_management_options to SendEmail as a typed parameter' do
+              mailer_data = mailer.deliver!(sample_message).context.params
+              expect(mailer_data[:list_management_options]).to eq(list_management_options)
+            end
+
+            it 'does not forward :list_management_options to the SES client constructor' do
+              captured = nil
+              allow(Aws::SESV2::Client).to receive(:new).and_wrap_original do |original, settings = {}|
+                captured = settings
+                original.call(stub_responses: { send_email: { message_id: ses_message_id } })
+              end
+              Mailer.new(client_options)
+              expect(captured).not_to have_key(:list_management_options)
+            end
+          end
+
+          it 'omits list_management_options when not configured' do
+            mailer_data = mailer.deliver!(sample_message).context.params
+            expect(mailer_data).not_to have_key(:list_management_options)
+          end
         end
       end
     end
