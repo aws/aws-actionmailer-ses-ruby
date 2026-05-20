@@ -6,9 +6,7 @@ module Aws
   module ActionMailer
     module SESV2
       describe Mailer do
-        let(:client_options) do
-          { stub_responses: { send_email: { message_id: ses_message_id } } }
-        end
+        let(:client_options) { { stub_responses: { send_email: { message_id: ses_message_id } } }}
 
         let(:mailer) { Mailer.new(client_options) }
 
@@ -28,13 +26,9 @@ module Aws
           )
         end
 
-        let(:ses_message_id) do
-          '0000000000000000-1111111-2222-3333-4444-555555555555-666666'
-        end
+        let(:ses_message_id) { '0000000000000000-1111111-2222-3333-4444-555555555555-666666' }
 
-        before do
-          ::ActionMailer::Base.ses_v2_settings = client_options
-        end
+        before { ::ActionMailer::Base.ses_v2_settings = client_options }
 
         describe '#settings' do
           it 'returns the client options' do
@@ -43,10 +37,8 @@ module Aws
         end
 
         describe '#deliver' do
-          it 'uses a precreated SESV2 client when provided' do
-            client = Aws::SESV2::Client.new(
-              stub_responses: { send_email: { message_id: ses_message_id } }
-            )
+          it 'uses a pre-created SESV2 client when provided' do
+            client = Aws::SESV2::Client.new(client_options)
             mailer = Mailer.new(sesv2_client: client)
 
             mailer_data = mailer.deliver!(sample_message).context.params
@@ -54,9 +46,7 @@ module Aws
           end
 
           it 'does not remove :sesv2_client from the settings hash (ActionMailer reuses it)' do
-            client = Aws::SESV2::Client.new(
-              stub_responses: { send_email: { message_id: ses_message_id } }
-            )
+            client = Aws::SESV2::Client.new(client_options)
             settings = { sesv2_client: client }
             Mailer.new(settings)
 
@@ -130,9 +120,7 @@ module Aws
           end
 
           context 'with :list_management_options in settings' do
-            let(:list_management_options) do
-              { contact_list_name: 'MarketingList', topic_name: 'Promos' }
-            end
+            let(:list_management_options) { { contact_list_name: 'MarketingList', topic_name: 'Promos' } }
             let(:client_options) do
               {
                 stub_responses: { send_email: { message_id: ses_message_id } },
@@ -150,7 +138,7 @@ module Aws
             captured = nil
             allow(Aws::SESV2::Client).to receive(:new).and_wrap_original do |original, settings = {}|
               captured = settings
-              original.call(stub_responses: { send_email: { message_id: ses_message_id } })
+              original.call(client_options)
             end
             Mailer.new(
               stub_responses: { send_email: { message_id: ses_message_id } },
@@ -158,9 +146,7 @@ module Aws
               email_tags: [{ name: 'a', value: 'b' }],
               list_management_options: { contact_list_name: 'L', topic_name: 'T' }
             )
-            expect(captured.keys).not_to include(
-              :configuration_set_name, :email_tags, :list_management_options
-            )
+            expect(captured.keys).not_to include(:configuration_set_name, :email_tags, :list_management_options)
           end
 
           it 'omits SendEmail options when not configured' do
@@ -168,6 +154,22 @@ module Aws
             expect(mailer_data).not_to have_key(:configuration_set_name)
             expect(mailer_data).not_to have_key(:email_tags)
             expect(mailer_data).not_to have_key(:list_management_options)
+          end
+
+          context 'with global ses_v2_settings containing SendEmail options' do
+            before do
+              ::ActionMailer::Base.ses_v2_settings = {
+                stub_responses: { send_email: { message_id: ses_message_id } },
+                configuration_set_name: 'Global'
+              }
+            end
+
+            it 'forwards global configuration_set_name through deliver_now' do
+              message = sample_message.deliver_now
+              delivery = message.delivery_method
+              puts delivery.inspect
+              expect(delivery.instance_variable_get(:@send_email_params)).to eq({ configuration_set_name: 'Global' })
+            end
           end
         end
       end
