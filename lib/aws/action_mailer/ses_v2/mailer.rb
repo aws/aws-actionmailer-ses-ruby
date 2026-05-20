@@ -46,7 +46,7 @@ module Aws
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
-        def deliver!(message)
+        def deliver!(message) # rubocop:disable Metrics/MethodLength
           params = { content: { raw: { data: message.to_s } } }
           params[:from_email_address] = from_email_address(message)
           params[:destination] = {

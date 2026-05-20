@@ -6,7 +6,7 @@ module Aws
   module ActionMailer
     module SESV2
       describe Mailer do
-        let(:client_options) { { stub_responses: { send_email: { message_id: ses_message_id } } }}
+        let(:client_options) { { stub_responses: { send_email: { message_id: ses_message_id } } } }
 
         let(:mailer) { Mailer.new(client_options) }
 
