@@ -12,6 +12,11 @@ Gem::Specification.new do |spec|
   spec.homepage     = 'https://github.com/aws/aws-actionmailer-ses-ruby'
   spec.license      = 'Apache-2.0'
   spec.files        = Dir['LICENSE', 'CHANGELOG.md', 'VERSION', 'lib/**/*']
+  spec.metadata = {
+    'source_code_uri' => 'https://github.com/aws/aws-actionmailer-ses-ruby',
+    'changelog_uri' => 'https://github.com/aws/aws-actionmailer-ses-ruby/blob/main/CHANGELOG.md',
+    'documentation_uri' => 'https://docs.aws.amazon.com/sdk-for-ruby/aws-actionmailer-ses/api/'
+  }
 
   # Require these versions for user_agent_framework configs
   spec.add_dependency('aws-sdk-ses', '~> 1', '>= 1.50.0')
