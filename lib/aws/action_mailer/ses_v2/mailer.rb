@@ -7,18 +7,45 @@ module Aws
     module SESV2
       # Provides a delivery method for ActionMailer that uses Amazon Simple Email Service V2.
       #
-      # Delivery settings are used to construct a new `Aws::SESV2::Client` instance.
       # Once you have a delivery method, you can configure your Rails environment to use it:
       #
       #     config.action_mailer.delivery_method = :ses_v2
       #     config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
       #
-      # Alternatively, you could pass the client itself.
+      # You may also pass a preconstructed client:
       #
-      # The passed in client will be prioritized regardless of other `:ses_v2_settings` given.
+      #     sesv2_client = Aws::SESV2::Client.new(region: 'us-west-2')
+      #     config.action_mailer.ses_v2_settings = { sesv2_client: sesv2_client }
+      #
+      # == SendEmail Options
+      #
+      # Settings in {SEND_EMAIL_KEYS} are forwarded directly to the
+      # {https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#send_email-instance_method SendEmail}
+      # API call rather than to the client constructor. They can be configured at
+      # any level:
+      #
+      #     # Global (all emails)
+      #     config.action_mailer.ses_v2_settings = {
+      #       region: 'us-west-2',
+      #       configuration_set_name: 'Production'
+      #     }
+      #
+      #     # Per-mailer class
+      #     class MarketingMailer < ApplicationMailer
+      #       default delivery_method_options: {
+      #         configuration_set_name: 'Marketing',
+      #         list_management_options: { contact_list_name: 'Promos', topic_name: 'Weekly' }
+      #       }
+      #     end
       #
       # @see https://guides.rubyonrails.org/action_mailer_basics.html
       class Mailer
+        SEND_EMAIL_KEYS = %i[
+          configuration_set_name
+          email_tags
+          list_management_options
+        ].freeze
+
         attr_reader :settings
 
         # @param [Hash] settings
@@ -27,24 +54,30 @@ module Aws
         #   an existing instance (e.g. to avoid credential resolution on every delivery).
         #   When provided, the injected client is used and all other options are ignored.
         #
-        #   Pass `:list_management_options` (a {Types::ListManagementOptions} hash) to enable
-        #   SES subscription management — typically supplied via ActionMailer's
-        #   `delivery_method_options` so it can be set per-mailer or per-message:
+        #   The following keys are extracted from settings and forwarded as parameters
+        #   to the [SendEmail](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#send_email-instance_method)
+        #   API call (they are not passed to the client constructor):
         #
-        #     default delivery_method_options: {
-        #       list_management_options: { contact_list_name: "...", topic_name: "..." }
-        #     }
+        #   * `:configuration_set_name` - The name of the configuration set to use for this message.
+        #   * `:email_tags` - A list of message tags ({Types::MessageTag} hashes).
+        #   * `:list_management_options` - A {Types::ListManagementOptions} hash for SES
+        #     subscription management.
+        #
         def initialize(settings = {})
           @settings = settings
+          @send_email_params = {}
           client_settings = settings.dup
-          @list_management_options = client_settings.delete(:list_management_options)
+          SEND_EMAIL_KEYS.each do |key|
+            value = client_settings.delete(key)
+            @send_email_params[key] = value if value
+          end
           @client = client_settings.delete(:sesv2_client) || Aws::SESV2::Client.new(client_settings)
 
           update_user_agent
         end
 
         # Delivers a Mail::Message object. Called during mail delivery.
-        def deliver!(message)
+        def deliver!(message) # rubocop:disable Metrics/MethodLength
           params = { content: { raw: { data: message.to_s } } }
           params[:from_email_address] = from_email_address(message)
           params[:destination] = {
@@ -52,7 +85,7 @@ module Aws
             cc_addresses: message.cc,
             bcc_addresses: message.bcc
           }
-          params[:list_management_options] = @list_management_options if @list_management_options
+          params.merge!(@send_email_params)
 
           @client.send_email(params).tap do |response|
             message.header[:ses_message_id] = response.message_id

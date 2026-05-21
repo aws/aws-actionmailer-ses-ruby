@@ -6,7 +6,9 @@
 [![Github stars](https://img.shields.io/github/stars/aws/aws-actionmailer-ses-ruby.svg)](https://github.com/aws/aws-actionmailer-ses-ruby/stargazers)
 
 This gem contains [ActionMailer](https://guides.rubyonrails.org/action_mailer_basics.html)
-delivery method classes with Amazon SES and SESV2.
+delivery method classes with Amazon SES and SESV2. See the
+[API documentation](https://docs.aws.amazon.com/sdk-for-ruby/aws-actionmailer-ses/api/)
+for the full reference.
 
 ## Installation
 
@@ -42,16 +44,13 @@ configure the corresponding settings in an environment file (for example
 
 ```ruby
 Rails.application.configure do |config|
-  ...
-
+  # ...
   config.action_mailer.delivery_method = :ses
   config.action_mailer.ses_settings = { region: 'us-west-2' }
 
   # Optional: reuse one client (e.g. fewer credential refreshes per email)
   ses_client = Aws::SES::Client.new(region: 'us-west-2')
   config.action_mailer.ses_settings = { ses_client: ses_client }
-
-  ...
 end
 ```
 
@@ -59,18 +58,30 @@ end
 
 ```ruby
 Rails.application.configure do |config|
-  ...
-
+  # ...
   config.action_mailer.delivery_method = :ses_v2
   config.action_mailer.ses_v2_settings = { region: 'us-west-2' }
 
   # Optional: reuse one client (e.g. fewer credential refreshes per email)
   sesv2_client = Aws::SESV2::Client.new(region: 'us-west-2')
   config.action_mailer.ses_v2_settings = { sesv2_client: sesv2_client }
-
-  ...
 end
 ```
+
+## SendEmail Options (SESV2)
+
+The SESV2 delivery method supports forwarding select
+[`SendEmail`](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SESV2/Client.html#send_email-instance_method)
+API parameters as typed settings. These are extracted from your settings and
+passed directly to the API call (not to the client constructor):
+
+| Option                     | Description                                                                                         |
+|----------------------------|-----------------------------------------------------------------------------------------------------|
+| `:configuration_set_name`  | The name of the configuration set to use for event tracking, reputation monitoring, etc.            |
+| `:email_tags`              | A list of message tag hashes (`[{ name: '...', value: '...' }]`) for fine-grained event publishing. |
+| `:list_management_options` | A hash (`{ contact_list_name: '...', topic_name: '...' }`) for SES subscription management.         |
+
+See the [API documentation](https://docs.aws.amazon.com/sdk-for-ruby/aws-actionmailer-ses/api/Aws/ActionMailer/SESV2/Mailer.html) for full details and usage examples.
 
 ## Using ARNs with SES
 
