@@ -1,4 +1,4 @@
-Unreleased Changes
+1.2.0 (2026-05-21)
 ------------------
 
 * Feature - Add support for `configuration_set_name` (#11), `email_tags` (#8), and `list_management_options` in SES V2 delivery settings.
