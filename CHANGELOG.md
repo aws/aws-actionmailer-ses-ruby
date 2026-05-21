@@ -1,7 +1,7 @@
 Unreleased Changes
 ------------------
 
-* Feature - SESV2: forward `:list_management_options` from delivery settings to `SendEmail` as the typed `ListManagementOptions` parameter, enabling SES subscription management. Set via `config.action_mailer.ses_v2_settings` or per-mailer `delivery_method_options`.
+* Feature - Add support for `configuration_set_name` (#11), `email_tags` (#8), and `list_management_options` in SES V2 delivery settings.
 
 1.1.0 (2026-03-31)
 ------------------
