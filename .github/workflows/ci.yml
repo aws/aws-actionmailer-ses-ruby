@@ -50,6 +50,8 @@ jobs:
             ruby: 3.2
           - rails: main
             ruby: jruby-9.4
+          - rails: main
+            ruby: jruby-10.0
 
     steps:
       - uses: actions/checkout@v6
